@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Congressional Hearing Analysis Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f3f4f6;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 24px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 16px;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      resize: vertical;
+    }
+    input[type="file"] {
+      margin-top: 8px;
+    }
+    .button-group {
+      display: flex;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    button {
+      flex: 1;
+      padding: 12px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1e40af;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Congressional Hearing Analysis Tool</h1>
+    <form action="/summarize" method="POST" enctype="multipart/form-data">
+      <label for="link">Transcript URL:</label>
+      <input type="text" id="link" name="link" placeholder="https://www.congress.gov/event/...">
+
+      <label for="pdf">Upload PDF Transcript:</label>
+      <input type="file" id="pdf" name="pdf" accept=".pdf">
+
+      <label for="text">Paste Transcript Text:</label>
+      <textarea name="text" id="text" rows="10" placeholder="Paste transcript text here..."></textarea>
+
+      <div class="button-group">
+        <button type="submit">Generate Summary</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
