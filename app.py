@@ -64,6 +64,8 @@ def process():
     if not transcript:
         return "Please provide a valid transcript source.", 400
 
+    print(f"Transcript: {transcript[:100]}...")  # Debugging line to check the transcript content
+    
     if action_type == "summarize":
         summary = summarize_text(transcript) 
         return render_template('summary.html', summary=summary)
