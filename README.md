@@ -15,6 +15,10 @@ This web application enables users to analyze congressional hearing transcripts 
 A video demonstration of both the summarization and bias detection tools is available here:  
 [https://youtu.be/UOyKZhBNzzg](https://youtu.be/UOyKZhBNzzg)
 
+## Further Reading
+
+This tool and its methodology are described in greater detail in the accompanying paper, **Democratizing Government Discourse.pdf**, which is included in this repository. The paper outlines the design decisions, bias detection framework, and technical approach behind the system.
+
 ## Installation
 
 1. **Clone the repository:**
