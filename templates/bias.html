@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bias Detection Tool</title>
+  <style>
+    #transcript-box {
+      width: 100%;
+      min-height: 200px;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 8px;
+      background: #f9f9f9;
+      margin-bottom: 20px;
+      white-space: pre-wrap;
+      cursor: text;
+      user-select: text;
+    }
+    #bias-result {
+      margin-top: 20px;
+      padding: 10px;
+      background: #eef;
+      border-radius: 6px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div style="max-width: 800px; margin: auto; padding: 20px;">
+    <h2>Bias Detection Tool</h2>
+    <div id="transcript-box">
+      [TRANSCRIPT START]
+      {{ transcript }}
+      [TRANSCRIPT END]
+    </div>
+
+    <form id="bias-form" method="POST" action="/bias">
+      <input type="hidden" name="selected_text" id="selected_text">
+      <button type="submit">Check Bias</button>
+    </form>
+
+    {% if bias_result %}
+      <div id="bias-result" style="display:block;">
+        <h3>Bias Analysis Result:</h3>
+        <p>{{ bias_result }}</p>
+      </div>
+    {% endif %}
+
+    <form action="/" method="GET" style="margin-top: 20px;">
+      <button type="submit">Detect Another Transcript</button>
+    </form>
+
+  </div>
+</body>
+</html>

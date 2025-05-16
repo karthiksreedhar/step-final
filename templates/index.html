@@ -63,7 +63,7 @@
 <body>
   <div class="container">
     <h1>Congressional Hearing Analysis Tool</h1>
-    <form action="/summarize" method="POST" enctype="multipart/form-data">
+    <form action="/process" method="POST" enctype="multipart/form-data">
       <label for="link">Transcript URL:</label>
       <input type="text" id="link" name="link" placeholder="https://www.congress.gov/event/...">
 
@@ -74,7 +74,8 @@
       <textarea name="text" id="text" rows="10" placeholder="Paste transcript text here..."></textarea>
 
       <div class="button-group">
-        <button type="submit">Generate Summary</button>
+        <button type="submit" name="action_type" value="summarize">Generate Summary</button>
+        <button type="submit" name="action_type" value="bias">Check for Bias</button>
       </div>
     </form>
   </div>
