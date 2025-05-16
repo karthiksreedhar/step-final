@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from PyPDF2 import PdfReader
 
 # Replace this with your actual OpenAI API key
-openai.api_key = "OPENAI_API_KEY_HERE"
+openai.api_key = ""
 
 def extract_text_from_pdf(path):
     reader = PdfReader(path)
