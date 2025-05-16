@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from werkzeug.utils import secure_filename
 import os
+import csv
 from summarize import extract_text_from_pdf, extract_text_from_url, summarize_text, clarify_question
 
 app = Flask(__name__)
@@ -76,6 +77,7 @@ def bias():
     if not selected_text:
         return jsonify({'error': 'No text selected.'}), 400
     # result = detect_bias(selected_text)
+    # TODO: replace 
     # Example result:
     result = {
         "bias_severity": "High",
@@ -83,6 +85,47 @@ def bias():
         "justification": "The statement strongly favors one party."
     }
     return jsonify(result)
+
+@app.route('/bias_feedback', methods=['POST'])
+def bias_feedback():
+    
+    selected_text = request.form.get('selected_text')
+    # remove new line chars for saving to csv for further analysis
+    if selected_text:
+        selected_text = ' '.join(selected_text.splitlines())
+        
+    bias_severity = request.form.get('bias_severity')
+    bias_type = request.form.get('bias_type')
+    justification = request.form.get('justification')
+    rating = request.form.get('rating')
+    comment = request.form.get('comment')
+    user_bias_severity = request.form.get('user_bias_severity')
+    user_bias_type = request.form.get('user_bias_type')
+
+    fieldnames = [
+        'selected_text', 'bias_severity', 'bias_type', 'justification',
+        'rating', 'comment', 'user_bias_severity', 'user_bias_type'
+    ]
+    row = {
+        'selected_text': selected_text,
+        'bias_severity': bias_severity,
+        'bias_type': bias_type,
+        'justification': justification,
+        'rating': rating,
+        'comment': comment,
+        'user_bias_severity': user_bias_severity,
+        'user_bias_type': user_bias_type
+    }
+
+    csv_path = 'results.csv'
+    write_header = not os.path.isfile(csv_path) or os.path.getsize(csv_path) == 0
+    with open(csv_path, 'a', newline='', encoding='utf-8') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        if write_header:
+            writer.writeheader()
+        writer.writerow(row)
+
+    return '', 204
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)

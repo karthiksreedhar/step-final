@@ -29,6 +29,9 @@
 <body>
   <div style="max-width: 800px; margin: auto; padding: 20px;">
     <h2>Bias Detection Tool</h2>
+    <p style="margin-bottom: 16px; color: #333;">
+      <b>Instructions:</b> Select the portion of the transcript you would like to analyze for bias, then click the <b>Check Bias</b> button below.
+    </p>
     <div id="transcript-box">
       {{ transcript }}
     </div>
@@ -41,6 +44,51 @@
     <div id="bias-result" style="display:none; margin-top:20px;">
       <h3>Bias Analysis Result:</h3>
       <p id="bias-result-text"></p>
+    </div>
+
+    <form id="feedback-form" method="POST" action="/bias_feedback" style="margin-top: 20px; display:none;">
+      <label for="rating"><b>How would you rate this bias analysis?</b></label>
+      <select name="rating" id="rating" required>
+        <option value="">Select rating</option>
+        <option value="5">Excellent</option>
+        <option value="4">Good</option>
+        <option value="3">Fair</option>
+        <option value="2">Poor</option>
+        <option value="1">Very Poor</option>
+      </select>
+      <br><br>
+
+      <label for="user_bias_severity"><b>Your Bias Severity:</b></label>
+      <select name="user_bias_severity" id="user_bias_severity" required>
+        <option value="">Select severity</option>
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+        <option value="None">None</option>
+      </select>
+      <br><br>
+
+      <label for="user_bias_type"><b>Your Bias Type:</b></label>
+      <select name="user_bias_type" id="user_bias_type" required>
+        <option value="">Select type</option>
+        <option value="Political">Political</option>
+        <option value="Ideological">Ideological</option>
+        <option value="Socioeconomic">Socioeconomic</option>
+        <option value="Other">Other</option>
+      </select>
+      <br><br>
+
+      <label for="comment"><b>Reason for your rating (optional):</b></label><br>
+      <textarea name="comment" id="comment" rows="3" cols="60" placeholder="Let us know why you gave this rating..."></textarea>
+      <input type="hidden" name="selected_text" id="feedback_selected_text">
+      <input type="hidden" name="bias_severity" id="feedback_bias_severity">
+      <input type="hidden" name="bias_type" id="feedback_bias_type">
+      <input type="hidden" name="justification" id="feedback_justification">
+      <br>
+      <button type="submit">Submit Feedback</button>
+    </form>
+    <div id="feedback-thankyou" style="display:none; margin-top:10px; color:green;">
+      Thank you for your feedback!
     </div>
 
     <script>
@@ -76,11 +124,35 @@
                 `<b>Bias Severity:</b> ${data.bias_severity}<br>
                  <b>Bias Type:</b> ${data.bias_type}<br>
                  <b>Justification:</b> ${data.justification}`;
+
+            // Populate feedback form hidden fields
+            document.getElementById('feedback_selected_text').value = selectedText;
+            document.getElementById('feedback_bias_severity').value = data.bias_severity;
+            document.getElementById('feedback_bias_type').value = data.bias_type;
+            document.getElementById('feedback_justification').value = data.justification;
+
+            // Reset feedback form and hide thank you message
+            document.getElementById('feedback-form').reset();
+            document.getElementById('feedback-thankyou').style.display = 'none';
+
+            // Show feedback form
+            document.getElementById('feedback-form').style.display = 'block';
+        });
+
+        document.getElementById('feedback-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            await fetch('/bias_feedback', {
+                method: 'POST',
+                body: formData
+            });
+            document.getElementById('feedback-form').style.display = 'none';
+            document.getElementById('feedback-thankyou').style.display = 'block';
         });
     </script>
 
     <form action="/" method="GET" style="margin-top: 20px;">
-      <button type="submit">Detect Another Transcript</button>
+      <button type="submit">Check Bias in Another Transcript</button>
     </form>
 
   </div>
