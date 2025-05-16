@@ -1,4 +1,4 @@
-# Congressional Hearing Summarization & Bias Detection Tool
+# Congressional Hearing Analysis Too
 
 This web application enables users to analyze congressional hearing transcripts for bias and generate structured summaries. Users can upload a PDF, paste transcript text, or (in the future) provide a URL to a hearing transcript. The system leverages advanced language models to identify and categorize bias, provide justifications, and collect user feedback to improve future analyses.
 
