@@ -24,6 +24,10 @@
       border-radius: 6px;
       display: none;
     }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
   </style>
 </head>
 <body>
@@ -38,8 +42,19 @@
 
     <form id="bias-form">
       <input type="hidden" name="selected_text" id="selected_text">
+      <label for="bias_mode"><b>Bias Detection Mode:</b></label>
+      <select name="bias_mode" id="bias_mode">
+        <option value="simple">Simple</option>
+        <option value="more_context">More Context</option>
+        <option value="most_context">Most Context</option>
+      </select>
       <button type="submit">Check Bias</button>
     </form>
+
+    <div id="loading-spinner" style="display:none; text-align:center; margin:10px;">
+      <span>Loading...</span>
+      <div style="display:inline-block; width:24px; height:24px; border:3px solid #ccc; border-top:3px solid #1e40af; border-radius:50%; animation:spin 1s linear infinite;"></div>
+    </div>
 
     <div id="bias-result" style="display:none; margin-top:20px;">
       <h3>Bias Analysis Result:</h3>
@@ -92,6 +107,41 @@
     </div>
 
     <script>
+        function renderBiasResult(data) {
+            if (!data.biased_quotes || !Array.isArray(data.biased_quotes)) {
+                return "<i>No bias detected or invalid response.</i>";
+            }
+            let html = '<ul style="padding-left:20px">';
+            data.biased_quotes.forEach((item, idx) => {
+                html += `<li style="margin-bottom:16px;">
+                    <b>Quote #${idx + 1}:</b> <span style="color:#222;">"${item.quote}"</span><br>
+                    <b>Start Sentence:</b> ${item.start_sentence}<br>
+                    <b>Bias Category:</b> ${item.bias_category}<br>
+                    <b>Bias Type:</b> ${item.bias_type}<br>
+                    <b>Bias Severity:</b> ${item.bias_severity}<br>
+                    <b>Justification:</b> <span style="color:#444;">${item.justification}</span><br>
+                    <button type="button" class="give-feedback-btn" 
+                        data-quote='${encodeURIComponent(item.quote)}'
+                        data-bias_severity='${item.bias_severity}'
+                        data-bias_type='${item.bias_type}'
+                        data-justification='${encodeURIComponent(item.justification)}'
+                    >Give Feedback</button>
+                </li>`;
+            });
+            html += '</ul>';
+            return html;
+        }
+
+        function populateFeedback(item) {
+            document.getElementById('feedback_selected_text').value = item.quote;
+            document.getElementById('feedback_bias_severity').value = item.bias_severity;
+            document.getElementById('feedback_bias_type').value = item.bias_type;
+            document.getElementById('feedback_justification').value = item.justification;
+            // Reset user fields and show the form
+            document.getElementById('feedback-form').reset();
+            document.getElementById('feedback-form').style.display = 'block';
+        }
+
         document.getElementById('bias-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             var selection = window.getSelection();
@@ -109,34 +159,45 @@
             }
             document.getElementById('selected_text').value = selectedText;
 
+            // Show spinner and disable button
+            document.getElementById('loading-spinner').style.display = 'block';
+            const checkBtn = this.querySelector('button[type="submit"]');
+            checkBtn.disabled = true;
+
+            const biasMode = document.getElementById('bias_mode').value;
+            const params = new URLSearchParams();
+            params.append('selected_text', selectedText);
+            params.append('bias_mode', biasMode);
+
             // AJAX request to /bias
             const response = await fetch('/bias', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: 'selected_text=' + encodeURIComponent(selectedText)
+                body: params.toString()
             });
             const data = await response.json();
+
+            // Hide spinner and enable button
+            document.getElementById('loading-spinner').style.display = 'none';
+            checkBtn.disabled = false;
+
             // Show the result in the bias-result div
             document.getElementById('bias-result').style.display = 'block';
-            document.getElementById('bias-result-text').innerHTML =
-                `<b>Bias Severity:</b> ${data.bias_severity}<br>
-                 <b>Bias Type:</b> ${data.bias_type}<br>
-                 <b>Justification:</b> ${data.justification}`;
+            document.getElementById('bias-result-text').innerHTML = renderBiasResult(data);
 
-            // Populate feedback form hidden fields
-            document.getElementById('feedback_selected_text').value = selectedText;
-            document.getElementById('feedback_bias_severity').value = data.bias_severity;
-            document.getElementById('feedback_bias_type').value = data.bias_type;
-            document.getElementById('feedback_justification').value = data.justification;
-
-            // Reset feedback form and hide thank you message
-            document.getElementById('feedback-form').reset();
-            document.getElementById('feedback-thankyou').style.display = 'none';
-
-            // Show feedback form
-            document.getElementById('feedback-form').style.display = 'block';
+            // Add event listeners to all Give Feedback buttons
+            document.querySelectorAll('.give-feedback-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.getElementById('feedback_selected_text').value = decodeURIComponent(this.getAttribute('data-quote'));
+                    document.getElementById('feedback_bias_severity').value = this.getAttribute('data-bias_severity');
+                    document.getElementById('feedback_bias_type').value = this.getAttribute('data-bias_type');
+                    document.getElementById('feedback_justification').value = decodeURIComponent(this.getAttribute('data-justification'));
+                    document.getElementById('feedback-form').reset();
+                    document.getElementById('feedback-form').style.display = 'block';
+                });
+            });
         });
 
         document.getElementById('feedback-form').addEventListener('submit', async function(e) {
@@ -152,6 +213,10 @@
     </script>
 
     <form action="/" method="GET" style="margin-top: 20px;">
+      <input type="hidden" name="selected_text" id="feedback_selected_text">
+      <input type="hidden" name="bias_severity" id="feedback_bias_severity">
+      <input type="hidden" name="bias_type" id="feedback_bias_type">
+      <input type="hidden" name="justification" id="feedback_justification">
       <button type="submit">Check Bias in Another Transcript</button>
     </form>
 

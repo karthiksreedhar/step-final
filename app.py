@@ -2,7 +2,9 @@ from flask import Flask, render_template, request, jsonify
 from werkzeug.utils import secure_filename
 import os
 import csv
+from bias import detect_bias
 from summarize import extract_text_from_pdf, extract_text_from_url, summarize_text, clarify_question
+from bias import detect_bias
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -65,8 +67,7 @@ def process():
     if action_type == "summarize":
         summary = summarize_text(transcript) 
         return render_template('summary.html', summary=summary)
-    elif action_type == "bias": 
-        # print("Call to bias detection API with transcript:", transcript)
+    elif action_type == "bias":
         return render_template('bias.html', transcript=transcript)
     else:
         return "Invalid action.", 400
@@ -74,17 +75,12 @@ def process():
 @app.route('/bias', methods=['POST'])
 def bias():
     selected_text = request.form.get('selected_text')
+    bias_mode = request.form.get('bias_mode', 'simple')  # default to simple
     if not selected_text:
         return jsonify({'error': 'No text selected.'}), 400
-    # result = detect_bias(selected_text)
-    # TODO: replace 
-    # Example result:
-    result = {
-        "bias_severity": "High",
-        "bias_type": "Political",
-        "justification": "The statement strongly favors one party."
-    }
-    return jsonify(result)
+
+    bias_json = detect_bias(selected_text, bias_mode)
+    return bias_json
 
 @app.route('/bias_feedback', methods=['POST'])
 def bias_feedback():
