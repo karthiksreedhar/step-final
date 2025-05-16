@@ -1,6 +1,6 @@
 from openai import OpenAI
 
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="")
 
 def detect_bias(transcript, mode='simple'):
     if mode == 'simple':
