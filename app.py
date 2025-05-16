@@ -65,7 +65,7 @@ def process():
         summary = summarize_text(transcript) 
         return render_template('summary.html', summary=summary)
     elif action_type == "bias": 
-        print("Call to bias detection API with transcript:", transcript)
+        # print("Call to bias detection API with transcript:", transcript)
         return render_template('bias.html', transcript=transcript)
     else:
         return "Invalid action.", 400

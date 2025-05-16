@@ -6,7 +6,8 @@
   <style>
     #transcript-box {
       width: 100%;
-      min-height: 200px;
+      height: 250px;              /* Fixed height */
+      overflow-y: auto;           /* Scrollable vertically */
       border: 1px solid #ccc;
       padding: 15px;
       border-radius: 8px;
@@ -29,9 +30,7 @@
   <div style="max-width: 800px; margin: auto; padding: 20px;">
     <h2>Bias Detection Tool</h2>
     <div id="transcript-box">
-      [TRANSCRIPT START]
       {{ transcript }}
-      [TRANSCRIPT END]
     </div>
 
     <form id="bias-form" method="POST" action="/bias">
@@ -45,6 +44,27 @@
         <p>{{ bias_result }}</p>
       </div>
     {% endif %}
+
+    <script>
+        // Capture selected text from transcript-box on form submit
+        document.getElementById('bias-form').addEventListener('submit', function(e) {
+        var selection = window.getSelection();
+        var transcriptBox = document.getElementById('transcript-box');
+        var selectedText = '';
+        if (selection.rangeCount) {
+            var range = selection.getRangeAt(0);
+            if (transcriptBox.contains(range.commonAncestorContainer)) {
+            selectedText = selection.toString();
+            }
+        }
+        if (!selectedText) {
+            alert('Please select a portion of the transcript to check for bias.');
+            e.preventDefault();
+            return false;
+        }
+        document.getElementById('selected_text').value = selectedText;
+        });
+    </script>
 
     <form action="/" method="GET" style="margin-top: 20px;">
       <button type="submit">Detect Another Transcript</button>
