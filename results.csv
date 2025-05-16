@@ -1,0 +1,2 @@
+selected_text,bias_severity,bias_type,justification,rating,comment,user_bias_severity,user_bias_type
+"The bills under consideration today all seek to shine a light on Big Tech’s secretive business practices, and hold them accountable when they harm their users, their competitors, or society more broadly, whether through deliberate action or through their failure to proactively identify and mitigate potential harms ahead of time.",moderate,Loaded/Emotive Language,The use of the term ,5,Test rating for bias analysis,Medium,Ideological
