@@ -13,7 +13,7 @@ This web application enables users to analyze congressional hearing transcripts 
 ## Demo
 
 A video demonstration of both the summarization and bias detection tools is available here:  
-[https://youtu.be/UOyKZhBNzzg](https://youtu.be/UOyKZhBNzzg)
+[video demo](https://youtu.be/UOyKZhBNzzg)
 
 ## Further Reading
 
