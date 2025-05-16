@@ -33,36 +33,49 @@
       {{ transcript }}
     </div>
 
-    <form id="bias-form" method="POST" action="/bias">
+    <form id="bias-form">
       <input type="hidden" name="selected_text" id="selected_text">
       <button type="submit">Check Bias</button>
     </form>
 
-    {% if bias_result %}
-      <div id="bias-result" style="display:block;">
-        <h3>Bias Analysis Result:</h3>
-        <p>{{ bias_result }}</p>
-      </div>
-    {% endif %}
+    <div id="bias-result" style="display:none; margin-top:20px;">
+      <h3>Bias Analysis Result:</h3>
+      <p id="bias-result-text"></p>
+    </div>
 
     <script>
-        // Capture selected text from transcript-box on form submit
-        document.getElementById('bias-form').addEventListener('submit', function(e) {
-        var selection = window.getSelection();
-        var transcriptBox = document.getElementById('transcript-box');
-        var selectedText = '';
-        if (selection.rangeCount) {
-            var range = selection.getRangeAt(0);
-            if (transcriptBox.contains(range.commonAncestorContainer)) {
-            selectedText = selection.toString();
-            }
-        }
-        if (!selectedText) {
-            alert('Please select a portion of the transcript to check for bias.');
+        document.getElementById('bias-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            return false;
-        }
-        document.getElementById('selected_text').value = selectedText;
+            var selection = window.getSelection();
+            var transcriptBox = document.getElementById('transcript-box');
+            var selectedText = '';
+            if (selection.rangeCount) {
+                var range = selection.getRangeAt(0);
+                if (transcriptBox.contains(range.commonAncestorContainer)) {
+                    selectedText = selection.toString();
+                }
+            }
+            if (!selectedText) {
+                alert('Please select a portion of the transcript to check for bias.');
+                return false;
+            }
+            document.getElementById('selected_text').value = selectedText;
+
+            // AJAX request to /bias
+            const response = await fetch('/bias', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'selected_text=' + encodeURIComponent(selectedText)
+            });
+            const data = await response.json();
+            // Show the result in the bias-result div
+            document.getElementById('bias-result').style.display = 'block';
+            document.getElementById('bias-result-text').innerHTML =
+                `<b>Bias Severity:</b> ${data.bias_severity}<br>
+                 <b>Bias Type:</b> ${data.bias_type}<br>
+                 <b>Justification:</b> ${data.justification}`;
         });
     </script>
 

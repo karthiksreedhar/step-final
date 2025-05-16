@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from werkzeug.utils import secure_filename
 import os
 from summarize import extract_text_from_pdf, extract_text_from_url, summarize_text, clarify_question
@@ -74,11 +74,15 @@ def process():
 def bias():
     selected_text = request.form.get('selected_text')
     if not selected_text:
-        return "No text selected.", 400
-    # Call your bias detection logic here, e.g.:
+        return jsonify({'error': 'No text selected.'}), 400
     # result = detect_bias(selected_text)
-    # For now, just echo the selected text:
-    return render_template('bias.html', transcript=selected_text, bias_result="(Bias analysis result here)")
+    # Example result:
+    result = {
+        "bias_severity": "High",
+        "bias_type": "Political",
+        "justification": "The statement strongly favors one party."
+    }
+    return jsonify(result)
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
